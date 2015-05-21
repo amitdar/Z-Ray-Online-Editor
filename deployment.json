@@ -1,0 +1,7 @@
+{
+  "name" : "online-editor",
+  "display_name" : "Online Editor",
+  "version" : "1.0.1",
+  "type": ["zray"],
+  "logo": "logo.png"
+}

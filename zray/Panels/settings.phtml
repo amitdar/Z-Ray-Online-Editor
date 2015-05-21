@@ -1,0 +1,176 @@
+<?php
+$tableParams = array(
+	'tableId' 			=> 'online-editor',
+    'tableWidth'        => '4',
+);
+?>
+
+<div style="padding: 10px;">
+Select theme: 
+<select id="online-ide-theme" size="1" class="online-ide-theme">
+	<optgroup label="Bright">
+		<option value="ace/theme/chrome">Chrome</option>
+		<option value="ace/theme/clouds">Clouds</option>
+		<option value="ace/theme/crimson_editor">Crimson Editor</option>
+		<option value="ace/theme/dawn">Dawn</option>
+		<option value="ace/theme/dreamweaver">Dreamweaver</option>
+		<option value="ace/theme/eclipse">Eclipse</option>
+		<option value="ace/theme/github">GitHub</option>
+		<option value="ace/theme/solarized_light">Solarized Light</option>
+		<option value="ace/theme/textmate">TextMate</option>
+		<option value="ace/theme/tomorrow">Tomorrow</option>
+		<option value="ace/theme/xcode">XCode</option>
+		<option value="ace/theme/kuroir">Kuroir</option>
+		<option value="ace/theme/katzenmilch">KatzenMilch</option>
+	</optgroup>
+	<optgroup label="Dark">
+		<option value="ace/theme/ambiance">Ambiance</option>
+		<option value="ace/theme/chaos">Chaos</option>
+		<option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+		<option value="ace/theme/cobalt">Cobalt</option>
+		<option value="ace/theme/idle_fingers">idle Fingers</option>
+		<option value="ace/theme/kr_theme">krTheme</option>
+		<option value="ace/theme/merbivore">Merbivore</option>
+		<option value="ace/theme/merbivore_soft">Merbivore Soft</option>
+		<option value="ace/theme/mono_industrial">Mono Industrial</option>
+		<option value="ace/theme/monokai">Monokai</option>
+		<option value="ace/theme/pastel_on_dark">Pastel on dark</option>
+		<option value="ace/theme/solarized_dark">Solarized Dark</option>
+		<option value="ace/theme/terminal">Terminal</option>
+		<option value="ace/theme/tomorrow_night">Tomorrow Night</option>
+		<option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
+		<option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option>
+		<option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option>
+		<option value="ace/theme/twilight">Twilight</option>
+		<option value="ace/theme/vibrant_ink">Vibrant Ink</option>
+	</optgroup>
+</select>
+</div>
+
+<style>
+.online-editor {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	z-index: 10000;
+}
+
+.online-ide-save-btn {
+	background:
+		url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAACH0lEQVQ4T6WUP2hTURTGv3NfGpNKQekmqIWsOgguioPFwUEFB4VCm6RJBgcrVAfb6FCnmAji4lRMmqZtEAUFnaSSVrqKqw6BInUQHSpoa9LnO58k/kvyXmM0d7pwz/3d852P+0k8k93jEMcUxqDTRThWAIv5y7FPrVdkOH1v1YIZ+H1APBHBSju2IzwrRL9lzGD+aux9Y61E0jm2XA4XJuPzXsBoJhdzKKOGugSRKYJvWqH/BAxnsuOiMg4wXwPWHm2Fdg38oYSlwmTiRG3nAhKYIrXoJZnQ3WJ6dhlyCEC8Ye5vC8l43QevDjv1+k8d0T2QomtCs6jAkCE+dtth2QKitiIifjzWLdxeuBY/8L+Sy7AYgS33YbAPxAtVXJm/Hn/lAlIwLYKnbYdI/QDHPKzDfi4Cy8GKfWr6xoXNJlNIxuaSifx2wNGbMwMKLkOwv7WGwFKwYp92ASvVvmIwsDEmYNPfdnbYJVPpeeQFa4A/dwFD1bVCObD3oM8YaezCVPWr45ejSoQFGHSFAiSrxDN3h6G+ud7VzeNUbQLC0LFsKatPJghe9BhLPQM8JfcGP58npRkIwFDeUXCuLXAkndswyhUYOfnLlEhqtt/2V9zALzu3fAE71RYYTudegrwrIjME7lgiD7Zz+Rt03aK51F5yKnuEImfEoJPEfg3FYQjGXKYIR2YnEgsuWX9LhuitfIjUQ00praSNQKmYHF7/Dp2hK8RZJOIvAAAAAElFTkSuQmCC');
+	background-repeat: no-repeat;
+	height: 24px;
+	width: 24px;
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.theme-selector {
+	float: left;
+    margin-right: 10px;
+}
+
+.ace_editor, .ace_editor p, .ace_editor div {
+	font-family: 'Monaco', 'Menlo', 'Droid Sans Mono', 'Courier New',
+		monospace !important;
+	border: auto !important;
+}
+</style>
+
+<script type="text/javascript">
+
+(function() {
+	var cookieParams = {};
+	var editors = [];
+
+	if (typeof jQuery.cookie('ZSDEVBAR_ONLINE_IDE') == 'undefined') {
+		jQuery.cookie('ZSDEVBAR_ONLINE_IDE', JSON.stringify({}), {path: '/'});
+	} else {
+		cookieParams = JSON.parse(jQuery.cookie('ZSDEVBAR_ONLINE_IDE'));
+	}
+	if (typeof cookieParams.theme != 'undefined') {
+		jQuery('#online-ide-theme').val(cookieParams.theme);
+	}
+	
+	function updateCookieParams() {		
+		jQuery.cookie('ZSDEVBAR_ONLINE_IDE', JSON.stringify(cookieParams));
+	};
+	
+    function saveEditor(editor, filePath) {
+        var code = encodeURIComponent(editor.getSession().getValue());
+		var saveParams = {'filepath': filePath, 'code': code};
+		zray.runAction('Online Editor', 'saveCode', saveParams, function(response) {
+			zendDevBar.message.show('Saved');
+		});
+    }
+
+    jQuery('#online-ide-theme').change(function() {
+    	var selectedTheme = jQuery(this).val();
+    	cookieParams.theme = selectedTheme; 
+    	updateCookieParams();
+    	jQuery.each(editors, function( index, value ) {
+    		value.setTheme(selectedTheme);
+  		});
+    	jQuery('.online-ide-theme').val(selectedTheme);
+    });
+    
+	zendDevBar.showInIde = function(event, filePath, line, fullUrl, eventsGroupId) {
+		zendDevBar.spinner.hide();
+		var params = {'filepath': filePath, 'line': line};
+		zray.runAction('Online Editor', 'showCode', params, function(response) {
+			if (response.indexOf('error:') == 0) {
+				zendDevBar.message.show(response, zendDevBar.MSG_ERROR);
+				return;
+			}
+			var rnd = Math.floor(Math.random() * 9999) + 1000;
+			var editorWrapper = jQuery('<div id="editor_' + rnd + '_wrapper" class="online-editor">\
+					<div class="zdb-col-4"><h1 style="float: left;"><span style="font-size: 14px;color: #006F9D;">' + filePath + '</span></h1><div class="zdb-pull-right"><ul class="zdb-toolbar-items zdb-horizontal"><li class="theme-selector"></li><li><a id="save_editor_' + rnd + '" class="online-ide-save-btn" href="javascript:void(0);" title="save"></a><li><a class="zdb-backtrace-back" href="javascript:void(0);" onclick="jQuery(\'#editor_' + rnd + '_wrapper\').remove();" title="back"></a></li></ul></div></div>\
+					<div id="editor_' + rnd + '" style="position: absolute; top: 35px; right: 0; bottom: 0; left: 0;"></div></div>');
+			jQuery('#online-ide-theme').clone(true).val(jQuery('#online-ide-theme').val()).appendTo(editorWrapper.find('.theme-selector'));
+			jQuery(event).closest('.zdb-toolbar-detail').append(editorWrapper);
+			jQuery.getScript( "//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js", function( data, textStatus, jqxhr ) {
+				 jQuery('#editor_' + rnd).text(response);
+				 var editor = ace.edit("editor_" + rnd);
+				 editors.push(editor);
+				 if (typeof cookieParams.theme != 'undefined') {
+					 editor.setTheme(cookieParams.theme);
+				 } else {
+					 editor.setTheme("ace/theme/chrome");
+				 }
+				 editor.getSession().setMode("ace/mode/javascript");
+				 //editor.setReadOnly(true);
+
+				 editor.session.setMode("ace/mode/php");
+				 
+				 editor.resize(true);
+				 editor.scrollToLine(line, true, true, function () {});
+				 editor.gotoLine(line);
+
+				 editor.commands.addCommand({
+				    name: "save",
+				    bindKey: {win: "Ctrl-S", mac: "Command-Option-S"},
+				    exec: function(editor) {
+				    	saveEditor(editor, filePath);
+				    	return true;
+				    }
+				 });
+
+				 jQuery(document).keyup(function(e) {
+					   if (e.keyCode == 27 && editorWrapper != null) {
+						   editorWrapper.remove();
+						   editorWrapper = null;
+					   }
+			     });
+				 
+				 jQuery('#save_editor_' + rnd).click(function() {
+					 saveEditor(editor, filePath);
+				 });
+			});
+		});
+	}
+})();
+</script>
+
