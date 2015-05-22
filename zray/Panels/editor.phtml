@@ -1,12 +1,11 @@
 <?php
 $tableParams = array(
-	'tableId' 			=> 'online-editor',
+	'tableId' 			=> 'online-editor-tree',
     'tableWidth'        => '4',
 );
 ?>
 
-<div style="padding: 10px;">
-Select theme: 
+<div style="display: none;">
 <select id="online-ide-theme" size="1" class="online-ide-theme">
 	<optgroup label="Bright">
 		<option value="ace/theme/chrome">Chrome</option>
@@ -47,6 +46,25 @@ Select theme:
 </select>
 </div>
 
+<?php
+$base = '/';
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $base = 'c:\\';
+} 
+?>
+
+<div style="padding: 10px;">
+    <form id="online-editor-form" style="margin-left: 10px;">
+    	<input type="text" id="filepath" name="filepath" placeholder="file path" value="<?php echo $base; ?>" style="width: 60%;">
+    	<input type="submit" value="Load"/>
+    </form>
+    <div id="online-editor-runner"></div>
+</div>
+
+<div>    
+    <?php echo $this->zrayTable($tableParams); //zrayTableHtml ?>
+</div>
+
 <style>
 .online-editor {
 	position: absolute;
@@ -77,6 +95,22 @@ Select theme:
 	font-family: 'Monaco', 'Menlo', 'Droid Sans Mono', 'Courier New',
 		monospace !important;
 	border: auto !important;
+}
+
+.online-ide-folder,
+.online-ide-file {
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABGUlEQVQ4T+3Uv0rDUBQG8PPdhL6B4J/JB9DBYqKITaK4KDeDs9DBXXDyOdwt+AYiAasOWghIO+hidxen2jdomk8SsEZEyK0Ze+bv/O7lXO6BVFzIvM1Aeyk5N7EBAvLWfYheTM/Dhq/PUqZrCngtNlOwI5Dz3mN0bYLC9fVNbZw047j9UWx0vTAQ8IQirTIgRIa9TtSF2whvE8Wj5040LDY6Db0sSo7LYFmG5IoC4j/BstBXrr59uGBbo1YOQnGJlLEp8jOf2kLrvbIbrvv78yq1L2fg9M8ym+Hvr2c6zckMHV+37ZrdfLq/GpgixfzWXriYjHgBx9OnoOxSSf8/IERWRXCXL1g3OKgrWt8LdgqZioNsIedglfUJV/KsQ21YyLMAAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
+	cursor: pointer;
+	height: 20px;
+}
+.online-ide-file {
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABIklEQVQ4T2NkgAJTBy8Jpn+Ma2B8dJqRmXHdif1b+nDJw8QZYQwLhwAFBoY/kzkYOCPRNf1g+DHl/38GAwZGhhUnD2zuwGcoioH///2ecPLQ1gB0DRYO3nP+MzDNYWRkKPr/n+EcPkOJNvAfA/MMLoZPF34w8i7DZyhJBp46sOmMg4MDy7f/3EsZGZnOY3MpyQaCggNk6HcG3iUMDAwX0A0l2sD/jEznGP8z3YKF7z/GP8yM/5kmMDAwLEQ2lEgDfcL/MjBYYotdJob/fn/+slufPbzuOUieKAPxJRNzO98tDEx/Mk4e2P5k1MAABVw5ZTQMUUJgiCebf///Tv3FyBxNqFRGlmf/928FA9PvFIycQqgKwGcJ2/9/gYcPb38NUgMAvJAVJEnL+f4AAAAASUVORK5CYII=');
+	background-repeat: no-repeat;
+}
+#zend-dev-bar div.online-ide-folder,
+#zend-dev-bar div.online-ide-file {
+	padding-left: 27px;
 }
 </style>
 
@@ -171,6 +205,163 @@ Select theme:
 			});
 		});
 	}
+
+	if (typeof cookieParams.list != 'undefined') {
+		jQuery('#filepath').val(cookieParams.list);
+	}
+	var currPath = jQuery('#filepath').val();
+	function setPath(path) {
+		currPath = path;
+		jQuery('#filepath').val(currPath);
+		cookieParams.list = currPath; 
+    	updateCookieParams();
+	}
+	function getPath() {
+		return currPath;
+	}
+	function listFiles(path) {
+		var params = {'path': path};
+    	zray.runAction('Online Editor', 'list', params, function(response) {
+    		if (response.indexOf('error:') == 0) {
+				zendDevBar.message.show(response, zendDevBar.MSG_ERROR);
+				return;
+			}
+			
+    		storage.setData(JSON.parse(response));
+    	});
+	}
+	function humanFileSize(bytes, si) {
+	    var thresh = si ? 1000 : 1024;
+	    if(Math.abs(bytes) < thresh) {
+	        return bytes + ' B';
+	    }
+	    var units = si
+	        ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+	        : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+	    var u = -1;
+	    do {
+	        bytes /= thresh;
+	        ++u;
+	    } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+	    return bytes.toFixed(1)+' '+units[u];
+	}
+	
+    var storage = zray.getStorage('online-editor-list');
+    storage.setLimit(-1);
+
+    storage.setSorter('name', function(data, direction) {
+        var folders = [];
+        var files = [];
+        jQuery.each(data, function(key, value) {
+            if (value.dir) {
+         	   folders.push(value);
+            } else {
+                files.push(value);
+            }
+        });
+
+        folders = folders.sort(function(a,b) {
+        	if (a.name == '..') {
+				if (direction == 'asc') {
+				    return -1;
+				} else {
+					return 1;
+				}
+			}
+        	return a.name.toLowerCase() == b.name.toLowerCase() ? 0 : a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+		});
+        files = files.sort(function(a,b) {
+        	return a.name.toLowerCase() == b.name.toLowerCase() ? 0 : a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+		});
+		if (direction == 'asc') {
+			  return folders.concat(files);
+		}
+		return files.concat(folders);
+        
+    	var result = data.sort(function(a,b) {
+			return a.dir > b.dir ? -1 : 1;
+		});
+    	result = result.sort(function(a,b) {
+        	if (a.dir == b.dir) {
+        		return a.name > b.name ? -1 : 1;
+        	}
+        	return 0;
+			
+		});
+		return result;
+        /*
+		var result = data.sort(function(a,b) {
+			if (a.name == '..') {
+				if (direction == 'asc') {
+				    return -1;
+				} else {
+					return 1;
+				}
+			}
+			
+			if (a.dir == b.dir) {
+				return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
+			}
+			return a.dir > b.dir ? -1 : 1;
+		});
+		return result;
+		*/
+	});
+	
+	// create main table
+	var maintable = zray.createTable(storage, jQuery('#<?php echo $tableParams['tableId']; ?>'));
+	maintable.setColumns([
+		{
+			label: 'Name',
+			propertyName: 'name',
+			sortable: true,
+			defaultSort: 'asc',
+			width: '50%',
+			getHtml: function(val, rec) {
+				var typeClass = rec.dir ? 'online-ide-folder' : 'online-ide-file';
+				var elem = jQuery('<div class="' + typeClass + '">' + val + '</div>');
+				
+			    elem.click(function() {
+				    if (val == '..') {
+				    	setPath(rec.path);
+				    	listFiles(rec.path);   
+				    }
+				    else {
+    			    	if (rec.dir) {
+    			    		setPath(rec.path);
+    			    		listFiles(currPath);
+    					} else {
+    			    		zendDevBar.showInIde(this, rec.path, '1');
+    					}
+				    }
+			    });
+				
+        		return elem;
+        	}
+		},
+		{
+			label: 'Size',
+			propertyName: 'size',
+			sortable: true,
+			width: '20%',
+			getHtml: function(val, rec) {
+				if (rec.dir) {
+					return '';
+				}
+			    return humanFileSize(val);
+			}
+		}
+	]);
+	
+	jQuery('#online-editor-form').submit(function (e) {
+		e.preventDefault();
+		var filePath = jQuery('#filepath').val();
+		listFiles(filePath);
+		//zendDevBar.showInIde(this, filePath, '1');
+	});
+
+	zray.registerExtensionLoaded('Online Editor', function(extensionData, requestData) {
+		listFiles(currPath);
+	});
 })();
 </script>
-

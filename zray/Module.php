@@ -13,13 +13,13 @@ class Module extends \ZRay\ZRayModule {
             'defaultPanels' => array(
              ),
 	        'panels' => array(
-				'settings' => array(
-					'display'       => true,
-				    'alwaysShow'    => true,
+	            'editor' => array(
+	                'display'       => true,
+	                'alwaysShow'    => true,
 	                'logo'          => 'logo.png',
-	                'menuTitle' 	=> 'Settings',
-	                'panelTitle'	=> 'Settings',
-				),
+	                'menuTitle' 	=> 'Editor',
+	                'panelTitle'	=> 'Editor',
+	            ),
 	         )
 	    );
 	}	
