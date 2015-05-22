@@ -161,7 +161,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			}
 			var rnd = Math.floor(Math.random() * 9999) + 1000;
 			var editorWrapper = jQuery('<div id="editor_' + rnd + '_wrapper" class="online-editor">\
-					<div class="zdb-col-4"><h1 style="float: left;"><span style="font-size: 14px;color: #006F9D;">' + filePath + '</span></h1><div class="zdb-pull-right"><ul class="zdb-toolbar-items zdb-horizontal"><li class="theme-selector"></li><li><a id="save_editor_' + rnd + '" class="online-ide-save-btn" href="javascript:void(0);" title="save"></a><li><a class="zdb-backtrace-back" href="javascript:void(0);" onclick="jQuery(\'#editor_' + rnd + '_wrapper\').remove();" title="back"></a></li></ul></div></div>\
+					<div class="zdb-col-4"><h1 style="float: left;"><span style="font-size: 14px;color: #006F9D;">' + filePath + '</span></h1><div class="zdb-pull-right"><ul class="zdb-toolbar-items zdb-horizontal"><li class="theme-selector"></li><li><a id="save_editor_' + rnd + '" class="online-ide-save-btn" href="javascript:void(0);" title="Save (ctrl+s)"></a><li><a class="zdb-backtrace-back" href="javascript:void(0);" onclick="jQuery(\'#editor_' + rnd + '_wrapper\').remove();" title="Back (esc)"></a></li></ul></div></div>\
 					<div id="editor_' + rnd + '" style="position: absolute; top: 35px; right: 0; bottom: 0; left: 0;"></div></div>');
 			jQuery('#online-ide-theme').clone(true).val(jQuery('#online-ide-theme').val()).appendTo(editorWrapper.find('.theme-selector'));
 			jQuery(event).closest('.zdb-toolbar-detail').append(editorWrapper);
