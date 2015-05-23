@@ -44,20 +44,21 @@ $zre->attachAction('list', 'OnlineEditor\shutdown', function() {
                 $result = array();
                 $parentDir = dirname($_POST['path']);
                 if ($_POST['path'] != $parentDir && is_dir($parentDir)) {
-                    $result[] = array('name' => '..', 'dir' => true, 'path' => dirname($_POST['path']), 'size' => 0);
+                    $result[] = array('name' => '..', 'dir' => true, 'path' => realpath(dirname($_POST['path'])), 'size' => 0);
                 }
                 foreach ($files as $file) {
                     if ($file == '.' || $file == '..') {
                         continue;
                     }
-                    $isDir = is_dir($_POST['path'] . $file);
+                    $filepath = realpath($_POST['path'] . $file);
+                    $isDir = is_dir($filepath);
                     $size = 0;
                     if (! $isDir) {
-                        if (file_exists ($_POST['path'] . $file)) {
-                            $size = filesize($_POST['path'] . $file);
+                        if (file_exists ($filepath)) {
+                            $size = filesize($filepath);
                         }
                     }
-                    $result[] = array('name' => $file, 'dir' => $isDir, 'path' => $_POST['path'] . $file, 'size' => $size);
+                    $result[] = array('name' => $file, 'dir' => $isDir, 'path' => $filepath, 'size' => $size);
                 }
                 echo json_encode($result);
                 exit;
@@ -78,6 +79,7 @@ $zre->attachAction('list', 'OnlineEditor\shutdown', function() {
 $zre->setMetadata(array(
 	'logo' => __DIR__ . DIRECTORY_SEPARATOR . 'logo.png',
 	'actionsBaseUrl' => $_SERVER["REQUEST_URI"],
+    'initDir' => getcwd(),
 ));
 
 function shutdown() {}

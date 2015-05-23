@@ -46,16 +46,9 @@ $tableParams = array(
 </select>
 </div>
 
-<?php
-$base = '/';
-if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    $base = 'c:\\';
-} 
-?>
-
 <div style="padding: 10px;">
     <form id="online-editor-form" style="margin-left: 10px;">
-    	<input type="text" id="filepath" name="filepath" placeholder="file path" value="<?php echo $base; ?>" style="width: 60%;">
+    	<input type="text" id="filepath" name="filepath" placeholder="file path" value="" style="width: 60%;">
     	<input type="submit" value="Load"/>
     </form>
     <div id="online-editor-runner"></div>
@@ -206,9 +199,6 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 		});
 	}
 
-	if (typeof cookieParams.list != 'undefined') {
-		jQuery('#filepath').val(cookieParams.list);
-	}
 	var currPath = jQuery('#filepath').val();
 	function setPath(path) {
 		currPath = path;
@@ -361,6 +351,11 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 	});
 
 	zray.registerExtensionLoaded('Online Editor', function(extensionData, requestData) {
+		if (typeof cookieParams.list != 'undefined') {
+			setPath(cookieParams.list);
+		} else {
+			setPath(zray.getExtensionMetadata('Online Editor').metadata.initDir);
+		}
 		listFiles(currPath);
 	});
 })();
