@@ -46,15 +46,18 @@ $tableParams = array(
 </select>
 </div>
 
-<div style="padding: 10px;">
-    <form id="online-editor-form" style="margin-left: 10px;">
-    	<input type="text" id="filepath" name="filepath" placeholder="file path" value="" style="width: 60%;">
-    	<input type="submit" value="Load"/>
-    </form>
+<div>
+    <ul class="tabs">
+        <li style="width: 100%;">
+            <form id="online-editor-form" style="margin-left: 10px;">
+                <label style="display: none;"></label>
+            	<input type="text" id="filepath" name="filepath" placeholder="file path" value="" style="width: 60%;">
+            	<input type="submit" value="Load"/>
+            </form>
+        </li>
+    </ul>
     <div id="online-editor-runner"></div>
-</div>
-
-<div>    
+    
     <?php echo $this->zrayTable($tableParams); //zrayTableHtml ?>
 </div>
 
