@@ -133,6 +133,11 @@ $tableParams = array(
         var code = encodeURIComponent(editor.getSession().getValue());
 		var saveParams = {'filepath': filePath, 'code': code};
 		zray.runAction('Online Editor', 'saveCode', saveParams, function(response) {
+			if (response.indexOf('error:') == 0) {
+				zendDevBar.message.show(response, zendDevBar.MSG_ERROR);
+				return;
+			}
+			
 			zendDevBar.message.show('Saved');
 		});
     }

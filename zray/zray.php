@@ -23,6 +23,7 @@ $zre->attachAction('saveCode', 'OnlineEditor\shutdown', function() {
         if (file_exists($_POST['filepath'])) {
             if (is_writable($_POST['filepath'])) {
                 file_put_contents($_POST['filepath'], $_POST['code']);
+                echo 'saved';
             } else {
                 echo 'error: The file is not writable';
             }
@@ -30,8 +31,6 @@ $zre->attachAction('saveCode', 'OnlineEditor\shutdown', function() {
             echo 'error: Cannot access file';
         }
     }
-    
-    echo 'saved';
     exit;
 });
 
@@ -63,16 +62,16 @@ $zre->attachAction('list', 'OnlineEditor\shutdown', function() {
                 echo json_encode($result);
                 exit;
             } else {
-                echo 'error: Cannot access file';
+                echo 'error: Cannot access path';
                 exit;
             }
         } else {
-            echo 'error: Cannot access file';
+            echo 'error: Cannot access path';
             exit;
         }
     }
 
-    echo 'saved';
+    echo 'error: Cannot access path';
     exit;
 });
 
