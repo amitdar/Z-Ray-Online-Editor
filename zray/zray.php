@@ -43,7 +43,7 @@ $zre->attachAction('list', 'OnlineEditor\shutdown', function() {
                 $result = array();
                 $parentDir = dirname($_POST['path']);
                 if ($_POST['path'] != $parentDir && is_dir($parentDir)) {
-                    $result[] = array('name' => '..', 'dir' => true, 'path' => realpath(dirname($_POST['path'])), 'size' => 0);
+                    $result[] = array('name' => '..', 'dir' => true, 'path' => realpath(dirname($_POST['path'])), 'size' => 0, 'writable' => false);
                 }
                 foreach ($files as $file) {
                     if ($file == '.' || $file == '..') {
@@ -57,7 +57,8 @@ $zre->attachAction('list', 'OnlineEditor\shutdown', function() {
                             $size = filesize($filepath);
                         }
                     }
-                    $result[] = array('name' => $file, 'dir' => $isDir, 'path' => $filepath, 'size' => $size);
+                    $isWritable = is_writable($filepath);
+                    $result[] = array('name' => $file, 'dir' => $isDir, 'path' => $filepath, 'size' => $size, 'writable' => $isWritable);
                 }
                 echo json_encode($result);
                 exit;

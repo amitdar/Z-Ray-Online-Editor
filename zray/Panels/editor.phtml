@@ -82,6 +82,18 @@ $tableParams = array(
 	margin-right: 10px;
 }
 
+.online-ide-lock {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAB1UlEQVQ4T63UPU8UURQG4PecmbubWECynwUR1BgKC+1sDEFN/A2UQkjobIwNYXZYBmwI8gNswE4Kai2MNhbGxM7EAk3YQACZkWj8IjOTc8i6avZjWAayU84975N77j0zhB4/lMbLVbUPEfoPfOzhMUXdMl3B/Gx4nZWWAIzUERH5AbZW6NCaCRbpexJ8LJivRretWJ4pcwbQLYC2ReQaM58D8I5/2aOfl+hnO5oMTqkplaKPyjSowIPAs5cB0oFpzYcmXgcwSsD8vmfcVGDBjW4R8FJVXwTzmTvNodyMnrco3FS2aoFnX0oFFt34LqCrICz4c6bSHio60RZYBnwvy+nASjgOohUC5vY9U20PFdxwk0BDvmc6jqzjxeV7mv2Wix0oHIg+UZtW20EVfcqgsohc+bKQ/dC83gLWsa/98VtiXE0zn/WaxqWZR//qW8BSJbqhhNdpsb91G75nhhPBQjW6SYJXiQMrcqDMuY72obXAy1w4Lej4e/ZisRy/B+H/bhotnwFUleequM/AGzD3Ne/yTOAfQHWiPkq9ahkQXQPTWO/AY66+a8tl5/dFYf4EcKr/ZOMkWr/3jmDRjccAmQQoc9I8kuiOpWZ69yHVEsfmJCDN+hHhHdAVHM9yzgAAAABJRU5ErkJggg==');
+	background-repeat: no-repeat;
+	height: 24px;
+	width: 24px;
+	float: left;
+}
+
+.zdb-table .online-ide-lock {
+  background-position: 0 2px;
+}
+
 .theme-selector {
 	float: left;
     margin-right: 10px;
@@ -137,7 +149,6 @@ $tableParams = array(
 				zendDevBar.message.show(response, zendDevBar.MSG_ERROR);
 				return;
 			}
-			
 			zendDevBar.message.show('Saved');
 		});
     }
@@ -152,7 +163,7 @@ $tableParams = array(
     	jQuery('.online-ide-theme').val(selectedTheme);
     });
     
-	zendDevBar.showInIde = function(event, filePath, line, fullUrl, eventsGroupId) {
+	zendDevBar.showInIde = function(event, filePath, line, fullUrl, eventsGroupId, writable) {
 		zendDevBar.spinner.hide();
 		var params = {'filepath': filePath, 'line': line};
 		zray.runAction('Online Editor', 'showCode', params, function(response) {
@@ -160,9 +171,10 @@ $tableParams = array(
 				zendDevBar.message.show(response, zendDevBar.MSG_ERROR);
 				return;
 			}
+			var writableDiv = writable ? '' : '<div class="online-ide-lock"></div>';
 			var rnd = Math.floor(Math.random() * 9999) + 1000;
 			var editorWrapper = jQuery('<div id="editor_' + rnd + '_wrapper" class="online-editor">\
-					<div class="zdb-col-4"><h1 style="float: left;"><span style="font-size: 14px;color: #006F9D;">' + filePath + '</span></h1><div class="zdb-pull-right"><ul class="zdb-toolbar-items zdb-horizontal"><li class="theme-selector"></li><li><a id="save_editor_' + rnd + '" class="online-ide-save-btn" href="javascript:void(0);" title="Save (ctrl+s)"></a><li><a class="zdb-backtrace-back" href="javascript:void(0);" onclick="jQuery(\'#editor_' + rnd + '_wrapper\').remove();" title="Back (esc)"></a></li></ul></div></div>\
+					<div class="zdb-col-4"><h1 style="float: left;">' + writableDiv + '<span style="font-size: 14px;color: #006F9D;">' + filePath + '</span></h1><div class="zdb-pull-right"><ul class="zdb-toolbar-items zdb-horizontal"><li class="theme-selector"></li><li><a id="save_editor_' + rnd + '" class="online-ide-save-btn" href="javascript:void(0);" title="Save (ctrl+s)"></a><li><a class="zdb-backtrace-back" href="javascript:void(0);" onclick="jQuery(\'#editor_' + rnd + '_wrapper\').remove();" title="Back (esc)"></a></li></ul></div></div>\
 					<div id="editor_' + rnd + '" style="position: absolute; top: 35px; right: 0; bottom: 0; left: 0;"></div></div>');
 			jQuery('#online-ide-theme').clone(true).val(jQuery('#online-ide-theme').val()).appendTo(editorWrapper.find('.theme-selector'));
 			jQuery(event).closest('.zdb-toolbar-detail').append(editorWrapper);
@@ -176,7 +188,10 @@ $tableParams = array(
 					 editor.setTheme("ace/theme/chrome");
 				 }
 				 editor.getSession().setMode("ace/mode/javascript");
-				 //editor.setReadOnly(true);
+
+				 if (! writable) {
+					   editor.setReadOnly(true);
+				 }
 
 				 editor.session.setMode("ace/mode/php");
 				 
@@ -329,7 +344,7 @@ $tableParams = array(
     			    		setPath(rec.path);
     			    		listFiles(currPath);
     					} else {
-    			    		zendDevBar.showInIde(this, rec.path, '1');
+    			    		zendDevBar.showInIde(this, rec.path, '1', null, null, rec.writable);
     					}
 				    }
 			    });
@@ -348,6 +363,21 @@ $tableParams = array(
 				}
 			    return humanFileSize(val);
 			}
+		},
+		{
+			label: '',
+			propertyName: 'writable',
+			sortable: false,
+			width: '30px',
+			getHtml: function(val, rec) {
+				if (rec.name == '..') {
+					return '';
+				}
+				if (val) {
+					return '';
+				}
+			    return '<div class="online-ide-lock" title="Read Only"></div>';
+			}
 		}
 	]);
 	
@@ -355,7 +385,6 @@ $tableParams = array(
 		e.preventDefault();
 		var filePath = jQuery('#filepath').val();
 		listFiles(filePath);
-		//zendDevBar.showInIde(this, filePath, '1');
 	});
 
 	zray.registerExtensionLoaded('Online Editor', function(extensionData, requestData) {
