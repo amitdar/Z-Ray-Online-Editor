@@ -120,11 +120,24 @@ $tableParams = array(
 #zend-dev-bar div.online-ide-file {
 	padding-left: 27px;
 }
+
+#zend-dev-bar div.online-editor-actions-disabled {
+    margin: 20px 10px;
+    color: #F00;
+    font-weight: bold;
+    font-size: 16px;
+}
 </style>
 
 <script type="text/javascript">
 
 (function() {
+	if (! zray.actionsEnabled()) {
+		jQuery("#online-editor-form :input").prop("disabled", true);
+		jQuery('#online-editor-tree').append('<div class="online-editor-actions-disabled">Run actions is disabled. Click here to <a href="' + zendDevBar.baseUrl + '/Z-Ray/AccessMode" target="_blank">enable it.</a></div>');
+		return;
+	}
+	
 	var cookieParams = {};
 	var editors = [];
 
