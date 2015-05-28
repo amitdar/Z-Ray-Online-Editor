@@ -83,4 +83,6 @@ $zre->setMetadata(array(
 ));
 
 function shutdown() {}
-register_shutdown_function('OnlineEditor\shutdown');
+if (isset($_POST['ZRayAction'])) {
+    register_shutdown_function('OnlineEditor\shutdown');
+}
