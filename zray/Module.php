@@ -17,8 +17,8 @@ class Module extends \ZRay\ZRayModule {
 	                'display'       => true,
 	                'alwaysShow'    => true,
 	                'logo'          => 'logo.png',
-	                'menuTitle' 	=> 'File Explorer',
-	                'panelTitle'	=> 'File Explorer',
+	                'menuTitle' 	=> 'Editor',
+	                'panelTitle'	=> 'Editor',
 	            ),
 	         )
 	    );
