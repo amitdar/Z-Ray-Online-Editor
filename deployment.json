@@ -3,5 +3,10 @@
   "display_name" : "Online Editor",
   "version" : "1.0.1",
   "type": ["zray"],
-  "logo": "logo.png"
+  "logo": "logo.png",
+  "dependencies": {
+    "plugin": {
+        "min": "1.0.3"
+    }
+  }
 }
