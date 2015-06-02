@@ -176,7 +176,7 @@ $tableParams = array(
     	jQuery('.online-ide-theme').val(selectedTheme);
     });
     
-	zendDevBar.showInIde = function(event, filePath, line, fullUrl, eventsGroupId, writable) {
+	zendDevBar.showInIde = function(event, filePath, line, fullUrl, eventsGroupId) {
 		zendDevBar.spinner.hide();
 		var params = {'filepath': filePath, 'line': line};
 		zray.runAction('Online Editor', 'showCode', params, function(response) {
@@ -184,8 +184,11 @@ $tableParams = array(
 				zendDevBar.message.show(response, zendDevBar.MSG_ERROR);
 				return;
 			}
+			var writable = response[0];
 			var writableDiv = writable ? '' : '<div class="online-ide-lock"></div>';
 			var saveBtnDiv = writable ? '<a id="save_editor_' + rnd + '" class="online-ide-save-btn" href="javascript:void(0);" title="Save (ctrl+s)"></a>' : '';
+
+			response = response.substring(1);
 			
 			var rnd = Math.floor(Math.random() * 9999) + 1000;
 			var editorWrapper = jQuery('<div id="editor_' + rnd + '_wrapper" class="online-editor">\
@@ -361,7 +364,7 @@ $tableParams = array(
     			    		setPath(rec.path);
     			    		listFiles(currPath);
     					} else {
-    			    		zendDevBar.showInIde(this, rec.path, '1', null, null, rec.writable);
+    			    		zendDevBar.showInIde(this, rec.path, '1', null, null);
     					}
 				    }
 			    });

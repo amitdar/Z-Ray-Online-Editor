@@ -9,7 +9,11 @@ $zre->attachAction('showCode', 'OnlineEditor\shutdown', function() {
             if (filesize($_POST['filepath']) > 1000000) { // 1MB
                 echo 'error: File size exceeded 1MB';
             } else {
-                echo file_get_contents($_POST['filepath']);
+                $writable = '0';
+                if (is_writable($_POST['filepath'])) {
+                    $writable = '1';
+                }
+                echo $writable . file_get_contents($_POST['filepath']);
             }
         } else {
             echo 'error: Cannot access file';
