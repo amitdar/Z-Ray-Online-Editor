@@ -82,7 +82,7 @@ $zre->attachAction('list', 'OnlineEditor\shutdown', function() {
 
 $zre->setMetadata(array(
 	'logo' => __DIR__ . DIRECTORY_SEPARATOR . 'logo.png',
-	'actionsBaseUrl' => $_SERVER["REQUEST_URI"],
+	'actionsBaseUrl' => 'http' . (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on') ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
     'initDir' => getcwd(),
 ));
 
