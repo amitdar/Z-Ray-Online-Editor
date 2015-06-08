@@ -1,9 +1,11 @@
 {
   "name" : "online-editor",
   "display_name" : "Online Editor",
-  "version" : "1.0.2",
+  "version" : "1.0.3",
   "type": ["zray"],
   "logo": "logo.png",
+  "eula": "LICENSE.txt",
+  "readme": "README.txt",
   "dependencies": {
     "plugin": {
         "min": "1.0.3"
