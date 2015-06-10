@@ -1,7 +1,7 @@
 {
   "name" : "online-editor",
   "display_name" : "Online Editor",
-  "version" : "1.0.3",
+  "version" : "1.0.4",
   "type": ["zray"],
   "logo": "logo.png",
   "eula": "LICENSE.txt",
