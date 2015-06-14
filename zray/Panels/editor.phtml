@@ -185,7 +185,7 @@ $tableParams = array(
 				return;
 			}
 			var rnd = Math.floor(Math.random() * 9999) + 1000;
-			var writable = response[0];
+			var writable = (response[0] == '1');
 			var writableDiv = writable ? '' : '<div class="online-ide-lock"></div>';
 			var saveBtnDiv = writable ? '<a id="save_editor_' + rnd + '" class="online-ide-save-btn" href="javascript:void(0);" title="Save (ctrl+s)"></a>' : '';
 

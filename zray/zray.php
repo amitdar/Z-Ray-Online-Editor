@@ -15,7 +15,8 @@ class Editor {
                 if (filesize($this->postParams['filepath']) > 1000000) { // 1MB
                     echo 'error: File size exceeded 1MB';
                 } else {
-                    echo file_get_contents($this->postParams['filepath']);
+                    $writable = is_writable($this->postParams['filepath']) ? '1' : '0';
+                    echo $writable . file_get_contents($this->postParams['filepath']);
                 }
             } else {
                 echo 'error: Cannot access file';
